@@ -1,0 +1,106 @@
+
+//new instance, calls constructor, sets vars
+ATT_NBIOT device(deviceId, deviceToken, apn)
+//:::ATT_NBIOT(const char* deviceId, const char* deviceToken, const char* apn)
+
+//also sets vars
+device.setAttDevice(deviceId, readPW(), apn);
+//::setAttDevice(const char* deviceId, const char* deviceToken, const char* apn)
+
+//initialize
+device.init(nbiotSerial, debugSerial, MODEM_ON_OFF_PIN);
+//::init(Stream& stream, Stream& debug, int8_t onoffPin)
+<
+	//allocases buffersize (250 bits)
+	initBuffer();
+	//onderliggend: this->_inputBuffer = static_cast<char*>(malloc(this->_inputBufferSize));
+	//welk een pointer naar de aangemaakte buffer in de _inputBuffer var steekt.
+	
+	//set modem serial stream to communicate with the modem
+	setModemStream(stream);
+	//onderliggend: zet  _modemStream  var
+	
+	//set debug serial stream to show debug info
+	setDiag(debug);
+	//onderliggend: zet _diagStream var zodat debugPrintLn er gebruik van kan maken
+	
+	//sodaq_nbIotOnOff is a small class to hold the onoff pin, does pinmode and has functions to turn the modem on/off
+	sodaq_nbIotOnOff.init(onoffPin);
+	//onderliggend: digitalWrite(_onoffPin, LOW); pinMode(_onoffPin, OUTPUT);
+	
+>
+
+//connect to server
+device.connect(server, port)
+//sets vars & makes sure device is connected
+<
+
+	//turns modem on
+	on();
+	//onderliggend: digitalWrite 1 to modem
+	
+	//purges all responses using readResponse 
+	purgeAllResponsesRead();
+	//onderliggend: commando's om alles uit te lezen.
+
+	//turns off radio
+	setRadioActive(false);
+	//onderliggend: "AT+CFUN=0"
+	
+	//retrieve and apply modem config
+	checkAndApplyNconfig()
+	//onderliggend: 
+	//    "AT+NCONFIG?" 
+	//    readResponse, to check config and apply new config if different
+	
+	//reboots modem
+	reboot();
+	//onderliggend:  "AT+NRB" & clears all responses
+	
+	on();
+	purgeAllResponsesRead();
+	
+	//sets the apn 
+	setApn(_apn)
+	//onderliggend: "AT+CGDCONT=1,\"IP\",\"" + apn + "\""
+	
+	setRadioActive(true)
+	//"AT+CFUN=1"
+	
+	//sets the operator, no need to force orange operator
+	setOperator()
+	//"AT+COPS=0"
+	
+	//does a safe timeout and polls untill connection succeeds.
+	waitForSignalQuality()
+	//repeat "AT+CSQ" untill +CSQ: 24,99 OK
+	
+	//last check if connected
+	attachBee()
+	//repeat "AT+CGATT?" untill +CGATT: 1 OK
+
+	//creates a socket to send from and receive UDP packets on
+	createSocket(localPort) 
+	// "AT+NSOCR=\"DGRAM\",17," + localPort + ",1"
+>
+
+
+//sending a message:
+device.sendPayload(packet, sizeof(packet));
+//::sendPayload(void* packet, unsigned char size)
+// sends a payload with the payload: deviceid + devicepw + packet
+// will convert the payload into HEX.
+// "AT+NSOST=0,\"" + serverip + "\"," + port + "," packetsize + ",\"" + packet(hex) + "\""
+
+
+//receiving a message:
+//upon receiving a message an URC(unsolicited result code) can be found in the modemstream.
+//the code will read the modemstream and save it in a buffer
+//when it finds a "+NSONMI" in the buffer using "sscanf" (c++ command to search buffer)
+// it will know from the URC how many bytes the packet it and save it.
+
+//reading a message: 
+// using ::socketReceiveBytes(char* buffer, size_t length, SaraN2UDPPacketMetadata* p)
+//this will do "AT+NSORF=" + socketID + "," + length 
+//to read the bytes in the socket
+

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+                                                                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>be.i8c</groupId>
+  <artifactId>nbIoTAgent</artifactId>
+  <packaging>jar</packaging>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <name>NBiot Device Agent</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <spring.boot-version>2.1.2.RELEASE</spring.boot-version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    
+	<nsn.cumulocity.version>9.20.0</nsn.cumulocity.version>
+  </properties>
+  
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Spring Boot BOM -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot-version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- Camel BOM -->
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-spring-boot-dependencies</artifactId>
+        <version>3.0.0-M1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <!-- Spring Boot -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-undertow</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <!-- Camel -->
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-stream-starter</artifactId>
+    </dependency>
+
+	
+    <dependency>
+      <groupId>com.nsn.cumulocity.clients-java</groupId>
+      <artifactId>java-client</artifactId>
+      <version>${nsn.cumulocity.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.nsn.cumulocity.model</groupId>
+      <artifactId>device-capability-model</artifactId>
+      <version>${nsn.cumulocity.version}</version>
+    </dependency>
+    
+	<dependency>
+		<groupId>org.apache.camel</groupId>
+		<artifactId>camel-netty4-starter</artifactId>
+        <version>3.0.0-M1</version>
+		<!-- use the same version as your Camel core version -->
+	</dependency>
+	
+	<dependency>
+	    <groupId>org.apache.camel</groupId>
+	    <artifactId>camel-rabbitmq-starter</artifactId>
+        <version>3.0.0-M1</version>
+	    <!-- use the same version as your Camel core version -->
+	</dependency>
+	
+    <!-- Test -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-test-spring</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>cumulocity-maven-repo</id>
+      <url>http://resources.cumulocity.com/maven/repository</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>cumulocity-plugins-repo</id>
+      <url>http://resources.cumulocity.com/maven/repository</url>
+    </pluginRepository>
+  </pluginRepositories>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring.boot-version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

@@ -1,0 +1,11 @@
+FROM openjdk:8-jre 
+
+WORKDIR /opt
+
+VOLUME /tmp
+
+COPY nbIoTAgent*.jar /opt/agent.jar
+
+EXPOSE 8888/udp
+
+ENTRYPOINT ["java", "-jar", "/opt/agent.jar", "-X"]
